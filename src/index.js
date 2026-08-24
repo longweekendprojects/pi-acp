@@ -57,10 +57,15 @@ class PiSession {
     this.openTools = new Set();
 
     const args = ["--mode", "rpc", "--name", `buzz-${sessionId.slice(0, 8)}`];
+    // pi accepts `provider/id` with an optional `:<thinking>` suffix, so a single
+    // model string can carry the reasoning level too.
     const model = process.env.BUZZ_AGENT_MODEL || process.env.PI_ACP_MODEL;
-    if (model) args.push("--model", model);
+    const thinking =
+      process.env.BUZZ_AGENT_THINKING_EFFORT || process.env.PI_ACP_THINKING || "";
+    if (model) args.push("--model", thinking && !model.includes(":") ? `${model}:${thinking}` : model);
     const provider = process.env.BUZZ_AGENT_PROVIDER || process.env.PI_ACP_PROVIDER;
     if (provider) args.push("--provider", provider);
+    this.thinking = thinking;
 
     log(`spawning ${PI_BIN} ${args.join(" ")} in ${cwd}`);
     this.child = spawn(PI_BIN, args, {
@@ -73,6 +78,12 @@ class PiSession {
     this.child.stderr.on("data", (chunk) => process.stderr.write(chunk));
     this.child.stdin.on("error", () => {});
     this.child.on("error", (err) => log(`pi process error: ${err?.message || err}`));
+
+    // A model string without a provider prefix cannot carry the thinking suffix,
+    // so set the level explicitly once the session is up.
+    if (this.thinking && (!model || model.includes(":"))) {
+      this.send({ type: "set_thinking_level", level: this.thinking });
+    }
     this.child.on("exit", (code) => {
       log(`pi exited for session ${this.id} with code ${code}`);
       for (const fn of this.listeners) fn({ type: "__exit", code });
