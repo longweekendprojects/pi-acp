@@ -1,0 +1,9 @@
+{
+  "id": "pi",
+  "label": "pi",
+  "command": "pi-acp",
+  "args": [],
+  "env": {},
+  "installInstructionsUrl": "https://github.com/longweekendprojects/pi-acp",
+  "installHint": "Buzz talks to pi through the pi-acp adapter. Install it with: npm install -g pi-acp."
+}

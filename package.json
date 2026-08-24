@@ -1,0 +1,42 @@
+{
+  "name": "pi-acp",
+  "version": "0.1.0",
+  "description": "Presents a pi session to Buzz over the Agent Client Protocol.",
+  "type": "module",
+  "bin": {
+    "pi-acp": "src/index.js"
+  },
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@agentclientprotocol/sdk": "^1.4.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/longweekendprojects/pi-acp.git"
+  },
+  "homepage": "https://github.com/longweekendprojects/pi-acp#readme",
+  "bugs": {
+    "url": "https://github.com/longweekendprojects/pi-acp/issues"
+  },
+  "keywords": [
+    "acp",
+    "agent-client-protocol",
+    "pi",
+    "buzz",
+    "zed",
+    "coding-agent"
+  ],
+  "files": [
+    "src",
+    "examples",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "smoke": "node test/smoke.js"
+  }
+}
