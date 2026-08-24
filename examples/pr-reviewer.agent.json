@@ -1,5 +1,6 @@
 {
   "format": "buzz-agent-snapshot",
+  "version": 1,
   "definition": {
     "name": "Pip",
     "sourceIsBuiltin": false,
