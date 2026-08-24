@@ -27,8 +27,8 @@ In Buzz, drop a harness definition at
 {
   "id": "pi",
   "label": "pi",
-  "command": "pi-acp",
-  "args": [],
+  "acpCommand": "pi-acp",
+  "agentCommand": "pi",
   "env": {},
   "installInstructionsUrl": "https://github.com/longweekendprojects/pi-acp",
   "installHint": "Buzz talks to pi through the pi-acp adapter. Install it with: npm install -g pi-acp."
@@ -37,7 +37,7 @@ In Buzz, drop a harness definition at
 
 Restart the app and pi appears alongside the harnesses that ship with it.
 
-Importing an `.agent.json` does not carry the harness choice with it, so a freshly imported agent shows `Harness: Not configured` and quietly falls back to Buzz's own agent. Buzz identifies a harness by the `agent_command` field on the agent record. Quit Buzz, set both `acp_command` and `agent_command` to `pi-acp` for your agent in
+Importing an `.agent.json` does not carry the harness choice with it, so a freshly imported agent shows `Harness: Not configured` and quietly falls back to Buzz's own agent. Buzz identifies a harness by its `id`, which the agent record stores in `agent_command`, while `acp_command` holds the binary to spawn. Quit Buzz, set `agent_command` to `pi` and `acp_command` to `pi-acp` for your agent in
 `~/Library/Application Support/xyz.block.buzz.app/agents/managed-agents.json`, then start Buzz again.
 
 `pi` must already be installed and working on its own. The adapter runs whatever `pi` your PATH resolves, so if `pi` starts in a terminal, it starts here.
