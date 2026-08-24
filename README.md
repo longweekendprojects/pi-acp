@@ -57,7 +57,7 @@ Everything is optional. Without any of it, the adapter runs plain `pi` and lets 
 | `PI_ACP_THINKING` | Reasoning level: `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, or `max`. |
 | `BUZZ_AGENT_THINKING_EFFORT` | Same as `PI_ACP_THINKING`. |
 
-Set these in the harness definition's `env` block to pin a default for every agent using the harness. The model string may also carry the level directly, as in `openai-codex/gpt-5.6-sol:xhigh`. Buzz's own Model dropdown reports `Harness default` because the adapter does not yet advertise `configOptions`, so the environment is currently the only place model choice takes effect.
+Set these in the harness definition's `env` block to pin a default for every agent using the harness. The model string may also carry the level directly, as in `anthropic/claude-sonnet-4-20250514:high`. Use whatever ids your own pi configuration enables; leave `env` empty to let pi decide. Buzz's own Model dropdown reports `Harness default` because the adapter does not yet advertise `configOptions`, so the environment is currently the only place model choice takes effect.
 
 The working directory matters more than any of these. pi reads `AGENTS.md`, skills, and project settings relative to it, so an agent pointed at a repository inherits that repository's instructions.
 
