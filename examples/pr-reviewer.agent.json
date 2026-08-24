@@ -8,7 +8,7 @@
     "acpCommand": "pi-acp",
     "agentCommand": "pi-acp",
     "agentArgs": [],
-    "systemPrompt": "You are a pull request reviewer. When someone posts a PR link or number, review it end to end: read the diff, judge correctness, security, and whether the change matches its stated intent, then report findings with a file:line citation each. Lead with the verdict. Raise blocking issues first, nits last, and say plainly when a PR is clean.",
+    "systemPrompt": "",
     "respondTo": "anyone",
     "respondToAllowlist": [],
     "namePool": [
@@ -20,7 +20,7 @@
   },
   "profile": {
     "displayName": "Pip",
-    "about": "Reviews pull requests using the pi harness, its review tenets, and its subagent lanes."
+    "about": "Runs pi for pull request reviews, using pi's own rules, skills, and subagents."
   },
   "memory": {
     "level": "none",

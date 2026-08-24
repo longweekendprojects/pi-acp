@@ -54,6 +54,8 @@ Everything is optional. Without any of it, the adapter runs plain `pi` and lets 
 
 The working directory matters more than any of these. pi reads `AGENTS.md`, skills, and project settings relative to it, so an agent pointed at a repository inherits that repository's instructions.
 
+Leave the client's own system prompt or persona field empty. The adapter deliberately does not forward it, because pi already has instructions of its own: your global rules, the working directory's `AGENTS.md`, and every skill you have installed. A second prompt layered on top competes with those rather than adding to them. Put behavior in pi's configuration, where the rest of your setup already lives.
+
 ## What comes across
 
 Assistant text and reasoning stream as they are produced. Tool calls appear as they start and update when they finish, tagged with an ACP tool kind so clients render the right icon. Images in a prompt are forwarded to pi. Cancelling a turn aborts the pi run.
