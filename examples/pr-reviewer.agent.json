@@ -2,21 +2,21 @@
   "format": "buzz-agent-snapshot",
   "version": 1,
   "definition": {
-    "name": "Pip",
+    "name": "Purl",
     "sourceIsBuiltin": false,
     "runtime": "pi",
     "systemPrompt": "",
     "respondTo": "anyone",
     "respondToAllowlist": [],
     "namePool": [
-      "Pip"
+      "Purl"
     ],
     "idleTimeoutSeconds": 900,
     "maxTurnDurationSeconds": 1800,
     "parallelism": 3
   },
   "profile": {
-    "displayName": "Pip",
+    "displayName": "Purl",
     "about": "Runs pi for pull request reviews, using pi's own rules, skills, and subagents."
   },
   "memory": {
