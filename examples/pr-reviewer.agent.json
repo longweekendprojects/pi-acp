@@ -4,10 +4,7 @@
   "definition": {
     "name": "Pip",
     "sourceIsBuiltin": false,
-    "backend": "custom",
-    "acpCommand": "pi-acp",
-    "agentCommand": "pi-acp",
-    "agentArgs": [],
+    "runtime": "pi",
     "systemPrompt": "",
     "respondTo": "anyone",
     "respondToAllowlist": [],

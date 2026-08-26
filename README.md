@@ -20,25 +20,24 @@ Then point your ACP client at the `pi-acp` command. In Zed, add it to `agent_ser
 }
 ```
 
-In Buzz, drop a harness definition at
+In Buzz, add a harness definition at
 `~/Library/Application Support/xyz.block.buzz.app/custom_harnesses/pi.json`:
 
 ```json
 {
   "id": "pi",
   "label": "pi",
-  "acpCommand": "pi-acp",
-  "agentCommand": "pi",
+  "command": "pi-acp",
+  "args": [],
   "env": {},
   "installInstructionsUrl": "https://github.com/longweekendprojects/pi-acp",
   "installHint": "Buzz talks to pi through the pi-acp adapter. Install it with: npm install -g pi-acp."
 }
 ```
 
-Restart the app and pi appears alongside the harnesses that ship with it.
+Restart Buzz. The `pi` harness then appears with the built-in harnesses. Buzz runs its bundled `buzz-acp` relay harness, which starts `pi-acp` as the selected ACP agent.
 
-Importing an `.agent.json` does not carry the harness choice with it, so a freshly imported agent shows `Harness: Not configured` and quietly falls back to Buzz's own agent. Buzz identifies a harness by its `id`, which the agent record stores in `agent_command`, while `acp_command` holds the binary to spawn. Quit Buzz, set `agent_command` to `pi` and `acp_command` to `pi-acp` for your agent in
-`~/Library/Application Support/xyz.block.buzz.app/agents/managed-agents.json`, then start Buzz again.
+Portable `.agent.json` snapshots select a harness through `definition.runtime`. Set it to `"pi"`, as in [`examples/pr-reviewer.agent.json`](examples/pr-reviewer.agent.json). Machine-local command fields do not belong in snapshots. For an agent imported without a runtime, choose `pi` from its Harness field in Buzz.
 
 `pi` must already be installed and working on its own. The adapter runs whatever `pi` your PATH resolves, so if `pi` starts in a terminal, it starts here.
 
