@@ -53,6 +53,14 @@ function toolKind(name) {
   return TOOL_KINDS[String(name || "").toLowerCase()] || "other";
 }
 
+/** pi addresses a model as `provider/id`, which is also the config option's value id. */
+function modelValue(model) {
+  if (!model) return null;
+  const id = model.id || model.modelId;
+  if (!id) return null;
+  return model.provider ? `${model.provider}/${id}` : id;
+}
+
 function textOf(result) {
   if (!result) return "";
   const blocks = Array.isArray(result.content) ? result.content : [];
@@ -201,6 +209,77 @@ export class PiSession {
     }
   }
 
+  /**
+   * Send an RPC command and resolve with its `data` payload. pi answers every
+   * command with `{type:"response", command, success, data}`, so the reply is
+   * matched by command name. Resolves null on failure, exit, or timeout, which
+   * keeps model discovery from blocking session creation.
+   */
+  request(command, timeoutMs = 10_000) {
+    return new Promise((resolve) => {
+      let done = false;
+      const settle = (value) => {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        off();
+        resolve(value);
+      };
+      const timer = setTimeout(() => settle(null), timeoutMs);
+      timer.unref?.();
+      const off = this.on((event) => {
+        if (event?.type === "__exit") return settle(null);
+        if (event?.type !== "response" || event.command !== command.type) return;
+        settle(event.success === false ? null : (event.data ?? {}));
+      });
+      this.send(command);
+    });
+  }
+
+  /**
+   * The session's selectable configuration, as ACP config options: every model
+   * pi has configured, and the thinking levels the selected model supports.
+   * Clients render these as pickers and change them with `session/set_config_option`.
+   */
+  async configOptions() {
+    const [available, state, levels] = await Promise.all([
+      this.request({ type: "get_available_models" }),
+      this.request({ type: "get_state" }),
+      this.request({ type: "get_available_thinking_levels" }),
+    ]);
+
+    const options = [];
+    const models = Array.isArray(available?.models) ? available.models : [];
+    if (models.length) {
+      options.push({
+        id: "model",
+        type: "select",
+        name: "Model",
+        category: "model",
+        currentValue: modelValue(state?.model) ?? modelValue(models[0]),
+        options: models.map((model) => ({
+          value: modelValue(model),
+          name: model?.name || modelValue(model),
+          description: model?.provider || null,
+        })),
+      });
+    }
+
+    const thinking = Array.isArray(levels?.levels) ? levels.levels : [];
+    if (thinking.length > 1) {
+      options.push({
+        id: "thought_level",
+        type: "select",
+        name: "Thinking",
+        category: "thought_level",
+        currentValue: state?.thinkingLevel || thinking[0],
+        options: thinking.map((level) => ({ value: level, name: level })),
+      });
+    }
+
+    return options;
+  }
+
   send(command) {
     if (this.child.killed || !this.child.stdin.writable) return;
     try {
@@ -264,8 +343,34 @@ export class PiAcpAgent {
   async newSession(params) {
     const sessionId = randomUUID();
     const cwd = params?.cwd || process.env.PI_ACP_CWD || process.cwd();
-    this.sessions.set(sessionId, new PiSession(sessionId, cwd, {}, this.spawnProcess));
-    return { sessionId, modes: null };
+    const session = new PiSession(sessionId, cwd, {}, this.spawnProcess);
+    this.sessions.set(sessionId, session);
+    return { sessionId, modes: null, configOptions: await session.configOptions() };
+  }
+
+  /**
+   * Change the model or thinking level on the live pi child. pi switches in
+   * place, so the conversation keeps its context across a change.
+   */
+  async setSessionConfigOption(params) {
+    const session = this.sessions.get(params?.sessionId);
+    if (!session) throw new Error(`unknown session ${params?.sessionId}`);
+
+    const value = params?.value;
+    if (params?.configId === "model" && typeof value === "string") {
+      const slash = value.indexOf("/");
+      const command =
+        slash === -1
+          ? { type: "set_model", modelId: value }
+          : { type: "set_model", provider: value.slice(0, slash), modelId: value.slice(slash + 1) };
+      if (!(await session.request(command))) log(`set_model rejected: ${value}`);
+    } else if (params?.configId === "thought_level" && typeof value === "string") {
+      if (!(await session.request({ type: "set_thinking_level", level: value }))) {
+        log(`set_thinking_level rejected: ${value}`);
+      }
+    }
+
+    return { configOptions: await session.configOptions() };
   }
 
   async cancel(params) {

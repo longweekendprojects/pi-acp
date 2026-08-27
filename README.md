@@ -56,7 +56,9 @@ Everything is optional. Without any of it, the adapter runs plain `pi` and lets 
 | `PI_ACP_THINKING` | Reasoning level: `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, or `max`. |
 | `BUZZ_AGENT_THINKING_EFFORT` | Same as `PI_ACP_THINKING`. |
 
-Set these in the harness definition's `env` block to pin a default for every agent using the harness. The model string may also carry the level directly, as in `anthropic/claude-sonnet-4-20250514:high`. Use whatever ids your own pi configuration enables; leave `env` empty to let pi decide. Buzz's own Model dropdown reports `Harness default` because the adapter does not yet advertise `configOptions`, so the environment is currently the only place model choice takes effect.
+Set these in the harness definition's `env` block to pin a default for every agent using the harness. The model string may also carry the level directly, as in `anthropic/claude-sonnet-4-20250514:high`. Use whatever ids your own pi configuration enables; leave `env` empty to let pi decide.
+
+These only set the starting point. The adapter advertises every model pi has configured, plus the thinking levels the selected model supports, as ACP config options, so the client's own Model and Thinking pickers list them and change them per session. Selecting one switches the running pi in place rather than restarting it, so the conversation keeps its context across the change. A model appears under the provider that owns it, which means provider aliases such as separate account lanes each list their own catalog and are selectable by name.
 
 The working directory matters more than any of these. pi reads `AGENTS.md`, skills, and project settings relative to it, so an agent pointed at a repository inherits that repository's instructions.
 
@@ -103,7 +105,7 @@ Diagnostics go to stderr, never stdout, because stdout carries the ACP stream. O
 
 ## Contributing
 
-Issues and pull requests are welcome. The most useful additions are `loadSession` support so conversations survive a client restart, richer tool-call content such as diffs for edits, and permission passthrough so a client can approve tool calls instead of relying on pi's own policy.
+Issues and pull requests are welcome. The most useful additions are recovery of a session killed mid-conversation by a crash or turn timeout, richer tool-call content such as diffs for edits, and permission passthrough so a client can approve tool calls instead of relying on pi's own policy. Resuming a session that has been idle for hours is deliberately not on that list: it re-sends the whole transcript at full price to restore context that is probably stale, which costs more than letting the client replay recent messages.
 
 ## License
 

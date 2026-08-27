@@ -37,7 +37,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "node --test test/entrypoint.test.js test/examples.js test/progress.test.js",
+    "test": "node --test test/entrypoint.test.js test/examples.js test/progress.test.js test/config-options.test.js",
     "smoke": "node test/smoke.js"
   }
 }

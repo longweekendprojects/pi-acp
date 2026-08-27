@@ -54,7 +54,30 @@ function fakeChild() {
   child.stderr = new EventEmitter();
   child.stdin = new EventEmitter();
   child.stdin.writable = true;
-  child.stdin.write = () => true;
+  // pi answers every RPC command with a response line. Model and thinking-level
+  // discovery runs at session start, so the fake child has to answer it too or
+  // `newSession` never resolves.
+  child.stdin.write = (line) => {
+    let command;
+    try {
+      command = JSON.parse(String(line));
+    } catch {
+      return true;
+    }
+    const data = {
+      get_available_models: { models: [{ provider: "anthropic", id: "claude-opus-5", name: "Claude Opus 5" }] },
+      get_state: { model: { provider: "anthropic", id: "claude-opus-5" }, thinkingLevel: "high" },
+      get_available_thinking_levels: { levels: ["off", "high"] },
+    }[command?.type];
+    if (!data) return true;
+    queueMicrotask(() => {
+      child.stdout.emit(
+        "data",
+        Buffer.from(`${JSON.stringify({ type: "response", command: command.type, success: true, data })}\n`),
+      );
+    });
+    return true;
+  };
   child.stdin.end = () => {
     child.stdin.writable = false;
   };
